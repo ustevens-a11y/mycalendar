@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Bill Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rose:#f8c8c4;--rose2:#f2a09a;--rose3:#e87870;--rose-s:#fef0ef;
+  --lav:#c8b8e8;--lav2:#b0a0d8;--lav3:#9880c8;--lav-s:#f3eef8;
+  --peach:#f8d8a8;--peach2:#f0b870;--peach-s:#fdf5e6;
+  --sage:#a8c8a8;--sage2:#80b080;--sage3:#60a060;--sage-s:#eef5ee;
+  --sky:#a8c8e8;--sky2:#78a8d0;--sky3:#5888c0;--sky-s:#eaf4fb;
+  --mint:#b0e0d0;--mint2:#80c8b0;
+  --cream:#fdf8f5;--white:#fffcfa;
+  --ink:#3d2420;--ink2:#8a6058;--ink3:#c8a098;--bd:#f0ddd8;
+}
+body{font-family:'Nunito',sans-serif;min-height:100vh;padding:20px 14px;
+  background:linear-gradient(135deg,#fef0ef 0%,#f3eef8 25%,#eef5ee 50%,#eaf4fb 75%,#fdf5e6 100%);}
+.bgf{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.bgf span{position:absolute;font-size:26px;opacity:.08;animation:flt 9s ease-in-out infinite;}
+.bgf span:nth-child(1){top:3%;left:2%;animation-delay:0s}
+.bgf span:nth-child(2){top:3%;right:2%;animation-delay:1.5s}
+.bgf span:nth-child(3){bottom:3%;left:2%;animation-delay:3s}
+.bgf span:nth-child(4){bottom:3%;right:2%;animation-delay:4.5s}
+.bgf span:nth-child(5){top:50%;left:1%;animation-delay:2s}
+.bgf span:nth-child(6){top:50%;right:1%;animation-delay:3.5s}
+@keyframes flt{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(4deg)}}
+.app{max-width:780px;margin:0 auto;position:relative;z-index:1;}
+
+/* toolbar */
+.toolbar{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;}
+.btn{padding:8px 16px;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(180,100,100,.14);}
+.btn:hover{transform:translateY(-2px);}
+.btn-rose{background:linear-gradient(135deg,var(--rose2),var(--rose3));color:#fff;}
+.btn-lav{background:linear-gradient(135deg,var(--lav2),var(--lav3));color:#fff;}
+.btn-sage{background:linear-gradient(135deg,var(--sage2),var(--sage3));color:#fff;}
+.btn-ghost{background:rgba(255,255,255,.75);color:var(--ink2);border:1px solid var(--bd);}
+
+/* header */
+.page-header{background:linear-gradient(135deg,var(--rose2),var(--lav2),var(--sky2));border-radius:20px;padding:20px 24px;margin-bottom:18px;text-align:center;position:relative;overflow:hidden;box-shadow:0 6px 24px rgba(160,80,100,.16);}
+.page-header::before{content:'🌸 🌺 🌼 🌷 🌻 🌹 🌸';position:absolute;top:7px;left:50%;transform:translateX(-50%);font-size:14px;letter-spacing:8px;opacity:.3;white-space:nowrap;}
+.page-header h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;color:#fff;margin:12px 0 4px;}
+.page-header p{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.75);}
+.month-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px;}
+.nav-btn{width:32px;height:32px;border:none;border-radius:50%;background:rgba(255,255,255,.35);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.nav-btn:hover{background:rgba(255,255,255,.55);}
+.month-label{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:#fff;min-width:180px;text-align:center;}
+
+/* card */
+.card{background:rgba(255,255,255,.75);border-radius:18px;padding:18px 20px;margin-bottom:16px;box-shadow:0 4px 18px rgba(160,80,100,.09);border:1.5px solid rgba(255,255,255,.85);backdrop-filter:blur(4px);}
+.card-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;margin-bottom:4px;color:var(--ink);}
+.card-sub{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--rose3);margin-bottom:14px;}
+
+/* month calendar grid */
+.cal-day-names{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+.cal-dn{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-bottom:4px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-cell{min-height:64px;border-radius:10px;padding:5px 6px;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.65);position:relative;transition:background .15s;}
+.cal-cell.other{background:rgba(240,220,216,.15);border-color:transparent;}
+.cal-cell.today{background:rgba(248,200,196,.45);border-color:var(--rose2);}
+.cal-cell.period-a{background:rgba(168,200,232,.2);border-color:rgba(120,168,208,.25);}
+.cal-cell.period-b{background:rgba(200,184,232,.2);border-color:rgba(176,160,216,.25);}
+.cal-cell.period-a.today{background:rgba(168,200,232,.35);border-color:var(--sky2);}
+.cal-cell.period-b.today{background:rgba(200,184,232,.35);border-color:var(--lav2);}
+.cal-num{font-size:10px;font-weight:700;color:var(--ink2);margin-bottom:3px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;}
+.cal-cell.today .cal-num{background:var(--rose2);color:#fff;border-radius:50%;font-size:9px;}
+.bill-chip{font-size:8px;padding:2px 5px;border-radius:4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;line-height:1.4;border:none;width:100%;text-align:left;font-family:'Nunito',sans-serif;font-weight:600;transition:opacity .15s;}
+.bill-chip:hover{opacity:.75;}
+.bill-chip.unpaid{background:rgba(176,160,216,.45);color:var(--lav3);}
+.bill-chip.paid{background:rgba(168,200,168,.45);color:var(--sage3);text-decoration:line-through;}
+.cal-more{font-size:8px;color:var(--ink3);cursor:pointer;padding:1px 0;}
+
+/* legend */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink2);}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+/* pay period sections */
+.period-section{margin-bottom:14px;}
+.period-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;margin-bottom:8px;}
+.period-a-hdr{background:linear-gradient(135deg,rgba(120,168,208,.35),rgba(120,168,208,.2));border:1px solid rgba(120,168,208,.4);}
+.period-b-hdr{background:linear-gradient(135deg,rgba(176,160,216,.35),rgba(176,160,216,.2));border:1px solid rgba(176,160,216,.4);}
+.period-hdr-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:400;color:var(--ink);}
+.period-hdr-dates{font-size:10px;font-weight:700;color:var(--ink2);}
+.period-hdr-total{font-family:'Playfair Display',serif;font-size:18px;color:var(--lav3);}
+.period-bill-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);margin-bottom:5px;transition:all .2s;}
+.period-bill-row:hover{background:rgba(255,255,255,.85);}
+.period-bill-row.paid{background:rgba(168,200,168,.2);border-color:rgba(128,176,128,.3);}
+.pbr-date{font-size:11px;font-weight:700;color:var(--ink2);width:36px;flex-shrink:0;text-align:center;line-height:1.3;}
+.pbr-day{font-size:8px;color:var(--ink3);display:block;}
+.pbr-name{flex:1;font-size:13px;font-weight:600;color:var(--ink);}
+.pbr-freq{font-size:9px;color:var(--ink3);margin-right:6px;}
+.pbr-amt{font-family:'Playfair Display',serif;font-size:16px;color:var(--lav3);white-space:nowrap;margin-right:8px;}
+.pbr-amt.paid{color:var(--sage3);}
+.pd-btn{width:22px;height:22px;border-radius:6px;border:1.5px solid rgba(180,140,180,.35);background:rgba(255,255,255,.6);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s;flex-shrink:0;}
+.pd-btn:hover{background:rgba(128,176,128,.3);}
+.pd-btn.on{background:var(--sage2);border-color:var(--sage2);color:#fff;}
+.period-empty{font-size:12px;color:var(--ink3);padding:8px 12px;font-style:italic;}
+.period-total-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;margin-top:6px;background:rgba(200,184,232,.25);border-radius:10px;border:1px solid rgba(176,160,216,.3);}
+.ptrl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--lav3);}
+.ptrv{font-family:'Playfair Display',serif;font-size:18px;color:var(--lav3);}
+.ptrv.paid-total{color:var(--sage3);}
+
+/* add bill form */
+.add-form{display:grid;grid-template-columns:70px 1fr 90px 110px auto;gap:7px;align-items:end;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.6);}
+.add-form label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:3px;}
+.add-form input,.add-form select{width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--ink);background:rgba(255,255,255,.7);outline:none;transition:border-color .2s;}
+.add-form input:focus,.add-form select:focus{border-color:var(--lav2);background:#fff;}
+.bill-list{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.bill-manage-row{display:flex;align-items:center;gap:8px;padding:7px 11px;background:rgba(255,255,255,.55);border-radius:9px;border:1px solid rgba(255,255,255,.75);font-size:12px;}
+.bmr-name{font-weight:600;color:var(--ink);flex:1;}
+.bmr-meta{font-size:10px;color:var(--ink3);}
+.bmr-amt{font-family:'Playfair Display',serif;font-size:14px;color:var(--lav3);margin-right:4px;}
+.bmr-del{background:transparent;border:none;color:var(--ink3);cursor:pointer;font-size:14px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .2s;}
+.bmr-del:hover{color:var(--rose3);background:var(--rose-s);}
+
+/* pay period date inputs */
+.pp-setup{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:12px 14px;background:rgba(255,255,255,.5);border-radius:12px;border:1px solid rgba(255,255,255,.7);}
+.pp-setup label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);}
+.pp-setup input{padding:6px 10px;border:1.5px solid var(--bd);border-radius:8px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--ink);background:rgba(255,255,255,.8);outline:none;}
+.pp-setup input:focus{border-color:var(--lav2);}
+
+/* summary totals */
+.month-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;}
+.sum-card{border-radius:12px;padding:10px;text-align:center;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.75);}
+.sum-val{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);}
+.sum-val.green{color:var(--sage3)}.sum-val.red{color:#e06060}
+.sum-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-top:2px;}
+
+@media(max-width:580px){
+  .add-form{grid-template-columns:1fr 1fr;gap:6px;}
+  .add-form>*:last-child{grid-column:span 2;}
+  .month-summary{grid-template-columns:1fr 1fr;}
+}
+@media print{
+  body{background:#fff;padding:8px;}
+  .bgf,.toolbar{display:none;}
+  .card{box-shadow:none;border:1px solid #eee;}
+  .page-header{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+<div class="bgf"><span>🌸</span><span>🌺</span><span>🌷</span><span>🌼</span><span>🌻</span><span>🌹</span></div>
+<div class="app">
+
+  <div class="toolbar">
+    <a href="index.html" class="btn btn-lav">📅 Calendar</a>
+    <a href="budget.html" class="btn btn-rose">💰 Budget</a>
+    <button class="btn btn-sage" onclick="window.print()">🖨️ Print</button>
+    <button class="btn btn-ghost" onclick="saveData()">💾 Save</button>
+  </div>
+
+  <div class="page-header">
+    <h1>🌺 Bill Calendar</h1>
+    <p>Monthly Bills · Pay Period Breakdown</p>
+    <div class="month-nav">
+      <button class="nav-btn" onclick="changeMonth(-1)">←</button>
+      <div class="month-label" id="month-label"></div>
+      <button class="nav-btn" onclick="changeMonth(1)">→</button>
+    </div>
+  </div>
+
+  <!-- PAY PERIOD SETUP -->
+  <div class="card">
+    <div class="card-sub">Biweekly Pay Periods</div>
+    <div class="card-title">⚙️ Set Your Pay Periods</div>
+    <div class="pp-setup">
+      <div>
+        <label>Period 1 Start</label>
+        <input type="date" id="p1-start" oninput="savePP();render()"/>
+      </div>
+      <div>
+        <label>Period 1 End</label>
+        <input type="date" id="p1-end" oninput="savePP();render()"/>
+      </div>
+      <div>
+        <label>Period 2 Start</label>
+        <input type="date" id="p2-start" oninput="savePP();render()"/>
+      </div>
+      <div>
+        <label>Period 2 End</label>
+        <input type="date" id="p2-end" oninput="savePP();render()"/>
+      </div>
+      <button class="btn btn-lav" onclick="autoCalcPeriods()" style="align-self:flex-end">↻ Auto-calculate</button>
+    </div>
+  </div>
+
+  <!-- MONTHLY CALENDAR VIEW -->
+  <div class="card">
+    <div class="card-sub">Full Month View</div>
+    <div class="card-title" id="cal-title">🌺 April 2026</div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(120,168,208,.4);border:1px solid rgba(120,168,208,.5)"></div>Period 1</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(176,160,216,.4);border:1px solid rgba(176,160,216,.5)"></div>Period 2</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(248,200,196,.5);border:1px solid var(--rose2)"></div>Today</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(176,160,216,.45)"></div>Bill due</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(168,200,168,.45)"></div>Paid ✓</div>
+    </div>
+    <div class="cal-day-names">
+      <div class="cal-dn">Sun</div><div class="cal-dn">Mon</div><div class="cal-dn">Tue</div>
+      <div class="cal-dn">Wed</div><div class="cal-dn">Thu</div><div class="cal-dn">Fri</div><div class="cal-dn">Sat</div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="month-summary" id="month-summary"></div>
+  </div>
+
+  <!-- PAY PERIOD BREAKDOWN -->
+  <div class="card">
+    <div class="card-sub">Pay Period Breakdown</div>
+    <div class="card-title">🗓️ Bills by Pay Period</div>
+    <div id="period-breakdown"></div>
+  </div>
+
+  <!-- MANAGE BILLS -->
+  <div class="card">
+    <div class="card-sub">Manage</div>
+    <div class="card-title">➕ Your Bills</div>
+    <div class="bill-list" id="bill-list"></div>
+    <div class="add-form">
+      <div>
+        <label>Day</label>
+        <input type="number" id="new-day" min="1" max="31" placeholder="1-31"/>
+      </div>
+      <div>
+        <label>Bill Name</label>
+        <input type="text" id="new-name" placeholder="e.g. Netflix" onkeydown="if(event.key==='Enter')addBill()"/>
+      </div>
+      <div>
+        <label>Amount</label>
+        <input type="number" id="new-amt" step="0.01" placeholder="0.00"/>
+      </div>
+      <div>
+        <label>Frequency</label>
+        <select id="new-freq">
+          <option value="monthly">Monthly</option>
+          <option value="biweekly">Biweekly</option>
+          <option value="weekly">Weekly</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="btn btn-lav" onclick="addBill()" style="width:100%;padding:9px 14px">+ Add Bill</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const YEAR=new Date().getFullYear();
+let curMonth=new Date().getMonth();
+
+// State
+let bills=JSON.parse(localStorage.getItem('billcal_bills')||'[]');
+let paidMap=JSON.parse(localStorage.getItem('billcal_paid')||'{}');
+// paidMap: { 'YYYY-MM-DD_billId': true }
+
+// Pay periods
+let pp={
+  p1start:localStorage.getItem('pp_p1start')||'',
+  p1end:localStorage.getItem('pp_p1end')||'',
+  p2start:localStorage.getItem('pp_p2start')||'',
+  p2end:localStorage.getItem('pp_p2end')||''
+};
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function parseDate(s){return s?new Date(s+'T12:00:00'):null;}
+function fmtMD(d){return (d.getMonth()+1)+'/'+d.getDate();}
+function fmtFull(d){return DAYS[d.getDay()]+', '+MONTHS[d.getMonth()]+' '+d.getDate();}
+function fmtAmt(n){return '$'+parseFloat(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function paidKey(dateStr,billId){return dateStr+'_'+billId;}
+function isPaid(dateStr,billId){return !!paidMap[paidKey(dateStr,billId)];}
+function togglePaid(dateStr,billId){
+  const k=paidKey(dateStr,billId);
+  paidMap[k]=!paidMap[k];
+  localStorage.setItem('billcal_paid',JSON.stringify(paidMap));
+  render();
+}
+
+function savePP(){
+  pp.p1start=document.getElementById('p1-start').value;
+  pp.p1end=document.getElementById('p1-end').value;
+  pp.p2start=document.getElementById('p2-start').value;
+  pp.p2end=document.getElementById('p2-end').value;
+  localStorage.setItem('pp_p1start',pp.p1start);
+  localStorage.setItem('pp_p1end',pp.p1end);
+  localStorage.setItem('pp_p2start',pp.p2start);
+  localStorage.setItem('pp_p2end',pp.p2end);
+}
+
+function saveData(){
+  localStorage.setItem('billcal_bills',JSON.stringify(bills));
+  localStorage.setItem('billcal_paid',JSON.stringify(paidMap));
+  savePP();
+  alert('🌸 Saved!');
+}
+
+// ── Auto-calculate pay periods for current month ───────────────────────────
+function autoCalcPeriods(){
+  const y=YEAR,m=curMonth;
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  // Biweekly: 1st-14th and 15th-end of month
+  const p1s=new Date(y,m,1),p1e=new Date(y,m,14);
+  const p2s=new Date(y,m,15),p2e=new Date(y,m,daysInMonth);
+  document.getElementById('p1-start').value=fmtDate(p1s);
+  document.getElementById('p1-end').value=fmtDate(p1e);
+  document.getElementById('p2-start').value=fmtDate(p2s);
+  document.getElementById('p2-end').value=fmtDate(p2e);
+  savePP();
+  render();
+}
+
+// ── Get bills for a specific date ──────────────────────────────────────────
+function getBillsForDate(date){
+  const result=[];
+  bills.forEach(b=>{
+    const d=date.getDate(),m=date.getMonth(),y=date.getFullYear();
+    const daysInMonth=new Date(y,m+1,0).getDate();
+    if(b.freq==='monthly'){
+      const billDay=Math.min(parseInt(b.day),daysInMonth);
+      if(d===billDay)result.push({bill:b,date});
+    } else if(b.freq==='biweekly'){
+      // Check if this day matches the biweekly cycle
+      const baseDay=parseInt(b.day);
+      if(d===baseDay)result.push({bill:b,date});
+      const secondDay=baseDay+14;
+      if(secondDay<=daysInMonth&&d===secondDay)result.push({bill:b,date});
+    } else if(b.freq==='weekly'){
+      const baseDay=parseInt(b.day);
+      let cur=baseDay;
+      while(cur<=daysInMonth){if(d===cur)result.push({bill:b,date});cur+=7;}
+    }
+  });
+  return result;
+}
+
+// ── Get all bills for a month ──────────────────────────────────────────────
+function getBillsForMonth(y,m){
+  const result=[];
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  for(let d=1;d<=daysInMonth;d++){
+    const date=new Date(y,m,d);
+    getBillsForDate(date).forEach(entry=>result.push(entry));
+  }
+  return result;
+}
+
+// ── Get bills within a date range ─────────────────────────────────────────
+function getBillsInRange(from,to){
+  const result=[];
+  if(!from||!to)return result;
+  const cur=new Date(from);
+  const end=new Date(to);
+  while(cur<=end){
+    getBillsForDate(cur).forEach(({bill})=>{
+      result.push({bill,date:new Date(cur)});
+    });
+    cur.setDate(cur.getDate()+1);
+  }
+  return result;
+}
+
+// ── Render monthly calendar ───────────────────────────────────────────────
+function renderCalendar(){
+  const y=YEAR,m=curMonth;
+  document.getElementById('cal-title').textContent='🌺 '+MONTHS[m]+' '+y;
+  document.getElementById('month-label').textContent=MONTHS[m]+' '+y;
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  const firstDay=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const daysInPrev=new Date(y,m,0).getDate();
+  const today=new Date();
+  const p1from=parseDate(pp.p1start),p1to=parseDate(pp.p1end);
+  const p2from=parseDate(pp.p2start),p2to=parseDate(pp.p2end);
+  const total=Math.ceil((firstDay+daysInMonth)/7)*7;
+  let totalDue=0,totalPaid=0;
+
+  for(let i=0;i<total;i++){
+    let dayNum,isCur=true;
+    if(i<firstDay){dayNum=daysInPrev-firstDay+i+1;isCur=false;}
+    else if(i>=firstDay+daysInMonth){dayNum=i-firstDay-daysInMonth+1;isCur=false;}
+    else dayNum=i-firstDay+1;
+    const cellDate=new Date(y,isCur?m:(i<firstDay?m-1:m+1),dayNum);
+    const isToday=cellDate.toDateString()===today.toDateString();
+    const inP1=p1from&&p1to&&cellDate>=p1from&&cellDate<=p1to;
+    const inP2=p2from&&p2to&&cellDate>=p2from&&cellDate<=p2to;
+    const cell=document.createElement('div');
+    let cls='cal-cell'+(isCur?'':' other')+(isToday?' today':'')+(inP1?' period-a':inP2?' period-b':'');
+    cell.className=cls;
+    const num=document.createElement('div');
+    num.className='cal-num';num.textContent=dayNum;cell.appendChild(num);
+
+    if(isCur){
+      const dayBills=getBillsForDate(cellDate);
+      const dateStr=fmtDate(cellDate);
+      dayBills.slice(0,2).forEach(({bill})=>{
+        const paid=isPaid(dateStr,bill.id);
+        if(paid)totalPaid+=parseFloat(bill.amount||0);
+        else totalDue+=parseFloat(bill.amount||0);
+        const chip=document.createElement('button');
+        chip.className='bill-chip '+(paid?'paid':'unpaid');
+        chip.title=bill.name+' — '+fmtAmt(bill.amount)+(paid?' ✓ PAID':'');
+        chip.textContent=(bill.amount?'$'+Math.round(bill.amount)+' ':'')+bill.name;
+        chip.onclick=()=>togglePaid(dateStr,bill.id);
+        cell.appendChild(chip);
+      });
+      if(dayBills.length>2){
+        const more=document.createElement('div');
+        more.className='cal-more';
+        more.textContent='+'+(dayBills.length-2)+' more';
+        cell.appendChild(more);
+      }
+    }
+    grid.appendChild(cell);
+  }
+
+  // Month summary
+  const allBills=getBillsForMonth(y,m);
+  const totalAll=allBills.reduce((s,{bill})=>s+parseFloat(bill.amount||0),0);
+  const paidAll=allBills.filter(({bill,date})=>isPaid(fmtDate(date),bill.id)).reduce((s,{bill})=>s+parseFloat(bill.amount||0),0);
+  const unpaidAll=totalAll-paidAll;
+  document.getElementById('month-summary').innerHTML=
+    '<div class="sum-card"><div class="sum-val">'+fmtAmt(totalAll)+'</div><div class="sum-lbl">Total Bills</div></div>'+
+    '<div class="sum-card"><div class="sum-val green">'+fmtAmt(paidAll)+'</div><div class="sum-lbl">Paid ✓</div></div>'+
+    '<div class="sum-card"><div class="sum-val red">'+fmtAmt(unpaidAll)+'</div><div class="sum-lbl">Still Due</div></div>';
+}
+
+// ── Render pay period breakdown ───────────────────────────────────────────
+function renderPeriods(){
+  const el=document.getElementById('period-breakdown');
+  el.innerHTML='';
+  const periods=[
+    {label:'Pay Period 1',from:pp.p1start,to:pp.p1end,cls:'period-a-hdr'},
+    {label:'Pay Period 2',from:pp.p2start,to:pp.p2end,cls:'period-b-hdr'},
+  ];
+
+  periods.forEach(({label,from,to,cls})=>{
+    if(!from||!to){
+      el.innerHTML+='<div style="font-size:12px;color:var(--ink3);padding:8px 0 14px;font-style:italic">Set pay period dates above to see breakdown.</div>';
+      return;
+    }
+    const fromDate=parseDate(from),toDate=parseDate(to);
+    const periodBills=getBillsInRange(fromDate,toDate);
+    let total=0,paidTotal=0;
+
+    const sec=document.createElement('div');
+    sec.className='period-section';
+
+    // Header
+    const hdr=document.createElement('div');
+    hdr.className='period-header '+cls;
+    hdr.innerHTML='<div><div class="period-hdr-title">'+label+'</div><div class="period-hdr-dates">'+fmtMD(fromDate)+' – '+fmtMD(toDate)+'</div></div>';
+    sec.appendChild(hdr);
+
+    if(!periodBills.length){
+      const empty=document.createElement('div');
+      empty.className='period-empty';
+      empty.textContent='No bills due in this period 🌸';
+      sec.appendChild(empty);
+    } else {
+      // Sort by date
+      periodBills.sort((a,b)=>a.date-b.date);
+      periodBills.forEach(({bill,date})=>{
+        const dateStr=fmtDate(date);
+        const paid=isPaid(dateStr,bill.id);
+        const amt=parseFloat(bill.amount||0);
+        total+=amt;
+        if(paid)paidTotal+=amt;
+
+        const row=document.createElement('div');
+        row.className='period-bill-row'+(paid?' paid':'');
+        const dayName=DAYS[date.getDay()];
+        const mo=String(date.getMonth()+1).padStart(2,'0'),dy=String(date.getDate()).padStart(2,'0');
+        row.innerHTML=
+          '<div class="pbr-date">'+mo+'/'+dy+'<span class="pbr-day">'+dayName+'</span></div>'+
+          '<div class="pbr-name">'+bill.name+'</div>'+
+          '<span class="pbr-freq">'+bill.freq+'</span>'+
+          '<div class="pbr-amt'+(paid?' paid':'')+'">'+fmtAmt(bill.amount)+'</div>'+
+          '<div class="pd-btn'+(paid?' on':'')+'" onclick="togglePaid(\''+dateStr+'\',\''+bill.id+'\')" title="'+(paid?'Mark unpaid':'Mark paid')+'">'+(paid?'✓':'')+'</div>';
+        sec.appendChild(row);
+      });
+
+      // Total row
+      const totRow=document.createElement('div');
+      totRow.className='period-total-row';
+      totRow.innerHTML='<span class="ptrl">Total Due</span><span class="ptrv">'+fmtAmt(total)+'</span>';
+      sec.appendChild(totRow);
+      if(paidTotal>0){
+        const paidRow=document.createElement('div');
+        paidRow.className='period-total-row';
+        paidRow.style.marginTop='4px';
+        paidRow.style.background='rgba(168,200,168,.2)';
+        paidRow.style.borderColor='rgba(128,176,128,.3)';
+        paidRow.innerHTML='<span class="ptrl" style="color:var(--sage3)">Paid So Far</span><span class="ptrv paid-total">'+fmtAmt(paidTotal)+'</span>';
+        sec.appendChild(paidRow);
+      }
+    }
+    el.appendChild(sec);
+  });
+}
+
+// ── Render bill manage list ────────────────────────────────────────────────
+function renderBillList(){
+  const el=document.getElementById('bill-list');
+  el.innerHTML='';
+  if(!bills.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--ink3);font-style:italic;padding:4px 0">No bills yet. Add your first bill below!</div>';
+    return;
+  }
+  [...bills].sort((a,b)=>parseInt(a.day)-parseInt(b.day)).forEach((b,i)=>{
+    const row=document.createElement('div');
+    row.className='bill-manage-row';
+    row.innerHTML='<span class="bmr-name">'+b.name+'</span>'+
+      '<span class="bmr-meta">Day '+b.day+' · '+b.freq+'</span>'+
+      '<span class="bmr-amt">'+fmtAmt(b.amount)+'</span>'+
+      '<button class="bmr-del" onclick="deleteBill(\''+b.id+'\')" title="Delete">×</button>';
+    el.appendChild(row);
+  });
+}
+
+// ── Add / delete bill ──────────────────────────────────────────────────────
+function addBill(){
+  const day=parseInt(document.getElementById('new-day').value)||0;
+  const name=document.getElementById('new-name').value.trim();
+  const amount=parseFloat(document.getElementById('new-amt').value)||0;
+  const freq=document.getElementById('new-freq').value;
+  if(!day||day<1||day>31){alert('Please enter a valid day (1-31).');return;}
+  if(!name){alert('Please enter a bill name.');return;}
+  bills.push({id:Date.now().toString(),name,amount,day,freq});
+  localStorage.setItem('billcal_bills',JSON.stringify(bills));
+  document.getElementById('new-day').value='';
+  document.getElementById('new-name').value='';
+  document.getElementById('new-amt').value='';
+  render();
+}
+
+function deleteBill(id){
+  const b=bills.find(x=>x.id===id);
+  if(!confirm('Delete "'+b.name+'"?'))return;
+  bills=bills.filter(x=>x.id!==id);
+  localStorage.setItem('billcal_bills',JSON.stringify(bills));
+  render();
+}
+
+// ── Month navigation ──────────────────────────────────────────────────────
+function changeMonth(d){
+  curMonth+=d;
+  if(curMonth<0){curMonth=11;}
+  else if(curMonth>11){curMonth=0;}
+  autoCalcPeriods();
+  render();
+}
+
+// ── Master render ─────────────────────────────────────────────────────────
+function render(){
+  renderCalendar();
+  renderPeriods();
+  renderBillList();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+(function init(){
+  // Load saved PP dates
+  const fields=['p1-start','p1-end','p2-start','p2-end'];
+  const keys=['p1start','p1end','p2start','p2end'];
+  keys.forEach((k,i)=>{
+    const v=localStorage.getItem('pp_'+k)||'';
+    const el=document.getElementById(fields[i]);
+    if(el)el.value=v;
+    pp[k]=v;
+  });
+  // If no pay periods set, auto-calculate for current month
+  if(!pp.p1start)autoCalcPeriods();
+  render();
+})();
+</script>
+</body>
+</html>
