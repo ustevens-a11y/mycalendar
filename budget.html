@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Annual Budget Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rose:#f8c8c4;--rose2:#f2a09a;--rose3:#e87870;--rose-s:#fef0ef;
+  --lav:#c8b8e8;--lav2:#b0a0d8;--lav3:#9880c8;--lav-s:#f3eef8;
+  --peach:#f8d8a8;--peach2:#f0b870;--peach3:#e89840;--peach-s:#fdf5e6;
+  --sage:#a8c8a8;--sage2:#80b080;--sage3:#60a060;--sage-s:#eef5ee;
+  --sky:#a8c8e8;--sky2:#78a8d0;--sky3:#5888c0;--sky-s:#eaf4fb;
+  --lilac:#d8c0f0;--lilac2:#c0a0e0;--lilac3:#a880d0;
+  --cream:#fdf8f5;--white:#fffcfa;
+  --ink:#3d2420;--ink2:#8a6058;--ink3:#c8a098;
+  --bd:#f0ddd8;
+}
+
+/* ── A5 page setup ── */
+body{
+  font-family:'Nunito',sans-serif;
+  background:linear-gradient(135deg,#fef0ef 0%,#f3eef8 25%,#eef5ee 50%,#eaf4fb 75%,#fdf5e6 100%);
+  min-height:100vh;padding:16px;overflow-x:hidden;position:relative;
+}
+
+/* floating bg flowers */
+.bgf{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.bgf span{position:absolute;font-size:28px;opacity:.09;animation:flt 9s ease-in-out infinite;}
+.bgf span:nth-child(1){top:4%;left:2%;animation-delay:0s;}
+.bgf span:nth-child(2){top:4%;right:2%;animation-delay:1.2s;}
+.bgf span:nth-child(3){top:48%;left:1%;animation-delay:2.5s;}
+.bgf span:nth-child(4){top:48%;right:1%;animation-delay:3.5s;}
+.bgf span:nth-child(5){bottom:4%;left:2%;animation-delay:4.5s;}
+.bgf span:nth-child(6){bottom:4%;right:2%;animation-delay:5.5s;}
+@keyframes flt{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-12px) rotate(4deg);}}
+
+.app{max-width:580px;margin:0 auto;position:relative;z-index:1;}
+
+/* ── Top toolbar ── */
+.toolbar{display:flex;gap:7px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
+.btn{padding:8px 16px;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(180,100,100,.14);}
+.btn:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(180,100,100,.22);}
+.btn-a{background:linear-gradient(135deg,var(--rose2),var(--rose3));color:#fff;}
+.btn-b{background:linear-gradient(135deg,var(--sage2),var(--sage3));color:#fff;}
+.btn-c{background:linear-gradient(135deg,var(--lav2),var(--lav3));color:#fff;}
+.btn-d{background:rgba(255,255,255,.75);color:var(--ink2);border:1px solid var(--bd);}
+
+/* ── Month tabs ── */
+.month-tabs{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;background:rgba(255,255,255,.5);border-radius:14px;padding:6px;border:1px solid rgba(255,255,255,.8);backdrop-filter:blur(4px);}
+.mtab{padding:5px 10px;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:var(--ink2);transition:all .2s;white-space:nowrap;}
+.mtab:hover{background:var(--rose-s);color:var(--rose3);}
+.mtab.active{background:linear-gradient(135deg,var(--rose2),var(--lav2));color:#fff;box-shadow:0 2px 8px rgba(180,100,200,.2);}
+.mtab.has-data{position:relative;}
+.mtab.has-data::after{content:'🌸';position:absolute;top:-4px;right:-4px;font-size:8px;}
+
+/* ── Month page ── */
+.mpage{display:none;}
+.mpage.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── Cover header ── */
+.cover{border-radius:18px;padding:18px 22px 14px;margin-bottom:13px;text-align:center;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--rose2) 0%,var(--lav2) 50%,var(--sky2) 100%);
+  box-shadow:0 6px 24px rgba(160,80,100,.16);}
+.cover::before{content:'🌸 🌺 🌼 🌷 🌻 🌹 🌸';position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:14px;letter-spacing:8px;opacity:.3;white-space:nowrap;}
+.cover h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;color:#fff;margin:14px 0 4px;text-shadow:0 2px 6px rgba(80,30,50,.2);}
+.cover-sub{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:12px;}
+.cover-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.cf{background:rgba(255,255,255,.28);border-radius:10px;padding:7px 12px;border:1px solid rgba(255,255,255,.45);}
+.cf-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:3px;}
+.cf input{background:transparent;border:none;outline:none;font-family:'Nunito',sans-serif;font-size:12px;font-weight:600;color:#fff;width:100%;}
+.cf input::placeholder{color:rgba(255,255,255,.5);}
+.prev-bal-display{background:rgba(255,255,255,.35);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;color:#fff;text-align:center;margin-top:6px;}
+
+/* ── Sections ── */
+.section{border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 3px 14px rgba(160,80,100,.08);border:1px solid rgba(255,255,255,.7);}
+.sh{padding:9px 14px;display:flex;align-items:center;gap:7px;}
+.sh-em{font-size:15px;}
+.sh-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:400;color:#fff;}
+.sb{padding:10px 12px;}
+
+/* ── Grid rows ── */
+.hrow,.drow{display:grid;gap:0;margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.55);}
+.hrow{margin-bottom:4px;}
+.hc{padding:5px 7px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.88);text-align:center;border-right:1px solid rgba(255,255,255,.22);}
+.hc:last-child{border-right:none;}
+.hc.l{text-align:left;padding-left:10px;}
+.dc{padding:6px 7px;background:rgba(255,255,255,.5);border-right:1px solid rgba(255,255,255,.4);font-size:11px;color:var(--ink);display:flex;align-items:center;backdrop-filter:blur(2px);}
+.dc:last-child{border-right:none;}
+.dc.lbl{color:var(--ink2);font-weight:500;padding-left:10px;}
+.dc.lbl.b{font-weight:700;color:var(--ink);}
+.dc.ri{justify-content:flex-end;}
+.dc.ce{justify-content:center;}
+.alt .dc{background:rgba(255,255,255,.3);}
+.trow .dc{background:rgba(255,255,255,.68);font-weight:700;}
+
+/* ── Inputs ── */
+.fi{background:rgba(255,255,255,.6);border:1px dashed rgba(200,140,140,.3);border-radius:6px;padding:3px 6px;font-family:'Nunito',sans-serif;font-size:11px;color:var(--ink);text-align:right;outline:none;transition:all .2s;width:72px;}
+.fi:focus{background:#fff;border-color:rgba(180,120,200,.5);box-shadow:0 0 0 2px rgba(180,120,200,.1);}
+.fi.w{width:100%;text-align:left;}
+.fi.dt{width:58px;text-align:center;font-size:10px;}
+.fi.sm{width:58px;text-align:center;}
+
+/* ── Pd checkbox ── */
+.pd{width:18px;height:18px;border-radius:5px;border:1px solid rgba(180,140,140,.35);background:rgba(255,255,255,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s;}
+.pd:hover{background:rgba(128,176,128,.3);}
+.pd.on{background:var(--sage2);border-color:var(--sage2);color:#fff;}
+
+/* ── Two col ── */
+.tcol{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+
+/* ── Summary ── */
+.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px;}
+.scard{border-radius:11px;padding:9px 8px;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.7);text-align:center;}
+.sval{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--ink);}
+.sval.pos{color:var(--sage3)}.sval.neg{color:#e06060}
+.slbl{font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-top:2px;}
+.scard.big{grid-column:span 1;background:linear-gradient(135deg,rgba(248,200,196,.6),rgba(216,192,240,.6));border:1.5px solid rgba(200,150,200,.3);}
+.scard.big .sval{font-size:24px;}
+
+/* ── Notes ── */
+.notes-area{background:rgba(255,255,255,.42);border-radius:10px;padding:10px;border:1px dashed rgba(200,150,150,.28);}
+.notes-lbl{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.notes-area textarea{width:100%;background:transparent;border:none;outline:none;font-family:'Nunito',sans-serif;font-size:11px;color:var(--ink);resize:none;min-height:44px;line-height:1.6;}
+
+/* ── Floral divider ── */
+.fdiv{text-align:center;font-size:13px;letter-spacing:7px;opacity:.35;margin:8px 0;}
+
+/* ── Footer ── */
+.footer{text-align:center;margin-top:14px;font-size:10px;color:var(--ink3);font-style:italic;padding:8px;}
+
+/* ── Section color themes ── */
+.s-rose .sh{background:linear-gradient(135deg,var(--rose2),var(--rose3));}
+.s-rose .hc{background:rgba(242,160,154,.72);}
+.s-rose .trow .dc{background:rgba(248,200,196,.62);}
+.s-lav .sh{background:linear-gradient(135deg,var(--lav2),var(--lav3));}
+.s-lav .hc{background:rgba(176,160,216,.72);}
+.s-lav .trow .dc{background:rgba(200,184,232,.62);}
+.s-peach .sh{background:linear-gradient(135deg,var(--peach2),var(--peach3));}
+.s-peach .hc{background:rgba(240,184,112,.72);}
+.s-peach .trow .dc{background:rgba(248,216,168,.62);}
+.s-sage .sh{background:linear-gradient(135deg,var(--sage2),var(--sage3));}
+.s-sage .hc{background:rgba(128,176,128,.72);}
+.s-sage .trow .dc{background:rgba(168,200,168,.62);}
+.s-sky .sh{background:linear-gradient(135deg,var(--sky2),var(--sky3));}
+.s-sky .hc{background:rgba(120,168,208,.72);}
+.s-sky .trow .dc{background:rgba(168,200,232,.62);}
+.s-lilac .sh{background:linear-gradient(135deg,var(--lilac2),var(--lilac3));}
+.s-lilac .hc{background:rgba(192,160,224,.72);}
+.s-lilac .trow .dc{background:rgba(216,192,240,.62);}
+.s-sum .sh{background:linear-gradient(135deg,var(--rose2),var(--lav2),var(--sky2));}
+
+/* ── Print / A5 ── */
+
+/* ── YNAB Widget ── */
+.ynab-selector{margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.5);}
+.ynab-selector-title{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--sage3);margin-bottom:6px;}
+.ynab-acct-list{display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto;}
+.ynab-acct-row{display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(255,255,255,.5);border-radius:7px;font-size:11px;cursor:pointer;border:1px solid transparent;transition:all .2s;}
+.ynab-acct-row:hover{background:rgba(255,255,255,.75);border-color:rgba(128,176,128,.3);}
+.ynab-acct-row.sel-chk{border-color:var(--sage2);background:rgba(168,200,168,.3);}
+.ynab-acct-row.sel-nf{border-color:var(--sky2);background:rgba(168,200,232,.3);}
+.ynab-acct-bal2{font-family:'Playfair Display',serif;font-size:13px;font-weight:400;margin-left:auto;color:var(--sage3);}
+.ynab-acct-bal2.neg{color:#e06060;}
+.ynab-pick-lbl{font-size:9px;color:var(--ink3);margin-left:4px;}
+.ynab-bar{background:linear-gradient(135deg,rgba(168,200,168,.4),rgba(168,200,232,.4));border-radius:14px;padding:11px 15px;margin-bottom:11px;border:1.5px solid rgba(255,255,255,.75);box-shadow:0 3px 12px rgba(100,160,100,.1);}
+.ynab-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sage3);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.ynab-accounts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.ynab-acct{background:rgba(255,255,255,.6);border-radius:10px;padding:8px 10px;border:1px solid rgba(255,255,255,.8);text-align:center;}
+.ynab-acct-name{font-size:9px;font-weight:700;color:var(--ink2);margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase;}
+.ynab-acct-bal{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--sage3);}
+.ynab-acct-bal.neg{color:#e06060;}
+.ynab-acct-type{font-size:8px;color:var(--ink3);margin-top:1px;}
+.ynab-refresh-btn{padding:4px 11px;background:linear-gradient(135deg,var(--sage2),var(--sage3));color:#fff;border:none;border-radius:16px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.ynab-refresh-btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(100,160,100,.25);}
+.ynab-refresh-btn:disabled{opacity:.6;cursor:default;}
+.ynab-tx-info{font-size:9px;color:var(--ink3);font-style:italic;}
+.ynab-tx-info span{color:var(--sage3);font-weight:700;}
+.fi.ynab-auto{background:rgba(168,200,168,.35);border-color:rgba(128,176,128,.4);color:var(--sage3);font-weight:700;}
+
+
+/* ── Bill Calendar ── */
+.bill-cal-section{background:var(--white);border-radius:16px;padding:18px 20px;box-shadow:0 3px 14px rgba(160,80,100,.08);border:1px solid rgba(255,255,255,.8);margin-bottom:14px;}
+.bill-cal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;margin-bottom:4px;}
+.bill-cal-sub{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--rose3);margin-bottom:14px;}
+.bill-month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:16px;}
+.bill-day-name{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:center;padding-bottom:4px;}
+.bill-day{min-height:52px;border-radius:8px;padding:4px 5px;position:relative;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.6);}
+.bill-day.other-month{background:rgba(240,220,216,.2);border-color:transparent;}
+.bill-day.today{background:rgba(248,200,196,.4);border-color:var(--rose2);}
+.bill-day.in-period{background:rgba(168,200,232,.25);border-color:rgba(120,168,208,.3);}
+.bill-day.has-bill{background:rgba(200,184,232,.3);border-color:rgba(176,160,216,.4);}
+.bill-day.today.has-bill{background:rgba(248,200,196,.5);border-color:var(--rose2);}
+.bill-day-num{font-size:10px;font-weight:700;color:var(--ink2);margin-bottom:2px;}
+.bill-day.today .bill-day-num{background:var(--rose2);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.bill-pill{font-size:8.5px;padding:1px 4px;border-radius:3px;background:rgba(176,160,216,.4);color:var(--lav3);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;line-height:1.4;}
+.bill-pill:hover{background:rgba(176,160,216,.7);}
+.bill-pill.paid{background:rgba(168,200,168,.4);color:var(--sage3);text-decoration:line-through;}
+.period-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ink2);}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+/* Pay period filtered view */
+.period-bills{display:flex;flex-direction:column;gap:6px;}
+.period-bill-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);}
+.period-bill-item.overdue{background:rgba(248,200,196,.4);border-color:rgba(232,168,160,.5);}
+.period-bill-item.paid{background:rgba(168,200,168,.3);border-color:rgba(128,176,128,.4);}
+.pbi-date{font-size:10px;font-weight:700;color:var(--ink2);width:32px;flex-shrink:0;text-align:center;line-height:1.2;}
+.pbi-day{font-size:8px;color:var(--ink3);display:block;}
+.pbi-name{flex:1;font-size:13px;font-weight:500;color:var(--ink);}
+.pbi-amount{font-family:'Playfair Display',serif;font-size:16px;color:var(--lav3);white-space:nowrap;}
+.pbi-pd{width:22px;height:22px;border-radius:6px;border:1.5px solid rgba(180,140,180,.35);background:rgba(255,255,255,.6);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s;flex-shrink:0;}
+.pbi-pd:hover{background:rgba(128,176,128,.3);}
+.pbi-pd.on{background:var(--sage2);border-color:var(--sage2);color:#fff;}
+.period-total{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(200,184,232,.3);border-radius:10px;border:1px solid rgba(176,160,216,.4);margin-top:8px;}
+.period-total-lbl{font-size:11px;font-weight:700;color:var(--lav3);text-transform:uppercase;letter-spacing:.06em;}
+.period-total-val{font-family:'Playfair Display',serif;font-size:20px;color:var(--lav3);}
+.bill-add-form{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.6);}
+.bill-add-form input,.bill-add-form select{padding:8px 11px;border:1.5px solid var(--bd);border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--ink);background:rgba(255,255,255,.65);outline:none;transition:border-color .2s;}
+.bill-add-form input:focus,.bill-add-form select:focus{border-color:var(--lav2);background:#fff;}
+.period-selector{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+.period-selector label{font-size:11px;font-weight:700;color:var(--ink2);}
+.period-selector input{padding:6px 10px;border:1.5px solid var(--bd);border-radius:8px;font-family:'Nunito',sans-serif;font-size:12px;color:var(--ink);background:rgba(255,255,255,.7);outline:none;}
+.period-selector input:focus{border-color:var(--lav2);}
+
+@media print{
+  @page{size:A5 portrait;margin:8mm;}
+  body{background:#fff !important;padding:0;}
+  .bgf,.toolbar,.month-tabs{display:none !important;}
+  .mpage{display:none !important;}
+  .mpage.active{display:block !important;}
+  .section{box-shadow:none;border:1px solid #e8d8d0;break-inside:avoid;}
+  .cover,.sh,.hc,.trow .dc,.scard{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .cover{background:linear-gradient(135deg,#f2a09a,#b0a0d8,#78a8d0) !important;}
+  .sum-grid{break-inside:avoid;}
+  .section{margin-bottom:6px;}
+  .sb{padding:7px 10px;}
+}
+</style>
+</head>
+<body>
+<div class="bgf"><span>🌸</span><span>🌺</span><span>🌷</span><span>🌼</span><span>🌻</span><span>🌹</span></div>
+
+<div class="app">
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <a href="index.html" class="btn" style="background:linear-gradient(135deg,#b0a0d8,#9880c8);color:#fff;text-decoration:none">📅 My Calendar</a>
+    <a href="billcal.html" class="btn" style="background:linear-gradient(135deg,#f2a09a,#e87870);color:#fff;text-decoration:none">🌺 Bills</a>
+    <button class="btn btn-a" onclick="window.print()">🖨️ Print A5</button>
+    <button class="btn btn-b" onclick="saveAll()">💾 Save All</button>
+    <button class="btn btn-c" onclick="loadAll()">📂 Load</button>
+    <button class="btn btn-d" onclick="clearMonth()">🗑️ Clear Month</button>
+    <button class="btn btn-a" onclick="copyPrevBalance()">↩️ Pull Prev Balance</button>
+  </div>
+
+  <!-- Month tabs -->
+  <div class="month-tabs" id="month-tabs"></div>
+
+  <!-- Bill Calendar Tab (above budget pages) -->
+  <div id="bill-cal-pane" style="display:none;animation:fadeUp .3s ease">
+    <div class="bill-cal-section">
+      <div class="bill-cal-sub">Monthly View</div>
+      <div class="bill-cal-title" id="bcal-title">🌺 Bill Calendar</div>
+      <div class="period-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(168,200,232,.5);border:1px solid rgba(120,168,208,.4)"></div>Pay Period</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(200,184,232,.4);border:1px solid rgba(176,160,216,.4)"></div>Has Bill</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(248,200,196,.5);border:1px solid var(--rose2)"></div>Today</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(168,200,168,.4);border:1px solid rgba(128,176,128,.4)"></div>Paid</div>
+      </div>
+      <div id="bcal-grid" class="bill-month-grid"></div>
+    </div>
+
+    <div class="bill-cal-section">
+      <div class="bill-cal-sub">Pay Period Filter</div>
+      <div class="bill-cal-title">🗓️ Bills This Pay Period</div>
+      <div class="period-selector">
+        <label>From:</label>
+        <input type="date" id="period-from" oninput="renderBillPeriod()"/>
+        <label>To:</label>
+        <input type="date" id="period-to" oninput="renderBillPeriod()"/>
+        <button onclick="setDefaultPeriod()" style="padding:6px 12px;background:linear-gradient(135deg,var(--lav2),var(--lav3));color:#fff;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;">This Pay Period</button>
+      </div>
+      <div class="period-bills" id="period-bills-list"></div>
+    </div>
+
+    <div class="bill-cal-section">
+      <div class="bill-cal-sub">Manage Bills</div>
+      <div class="bill-cal-title">➕ Add / Edit Bills</div>
+      <div id="bill-manage-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px"></div>
+      <div class="bill-add-form">
+        <input type="number" id="bill-day" placeholder="Day (1-31)" min="1" max="31" style="width:110px"/>
+        <input type="text" id="bill-name-new" placeholder="Bill name" style="flex:1;min-width:120px"/>
+        <input type="number" id="bill-amt" placeholder="Amount" step="0.01" style="width:90px"/>
+        <select id="bill-freq">
+          <option value="monthly">Monthly</option>
+          <option value="biweekly">Biweekly</option>
+          <option value="weekly">Weekly</option>
+          <option value="once">One-time</option>
+        </select>
+        <button onclick="addBillEntry()" style="padding:8px 14px;background:linear-gradient(135deg,var(--lav2),var(--lav3));color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Month tabs -->
+
+  <!-- Month pages (generated by JS) -->
+  <div id="pages"></div>
+
+  <div class="footer">🌸 Budget with intention · Save with purpose · Spend with joy 🌷</div>
+</div>
+
+<script>
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTH_EM=['🌷','🌸','🌺','🌼','🌻','☀️','🌴','🍃','🍂','🎃','🍁','❄️'];
+const YEAR=new Date().getFullYear();
+
+// Items
+const INC_ITEMS=['Pay','Store Returns','Dad','Mom','',''];
+const BILL_COUNT=14;
+const NFCU_COUNT=4;
+const VAR_ITEMS=['Gas','Gas','Groceries','Eat Out','Dunkin','EPass','Misc.','Sunpass','Nails','Purse Money','',''];
+const SAV_ITEMS=['Regular','Holiday','House Money'];
+const SINK_ITEMS=['Beg. Sinking Fund Balance','Add','Transfer to MCU Checking','Transfer to Purse Money','',''];
+const MCU_ITEMS=['Checking','Bran Savings'];
+
+let currentMonth=new Date().getMonth();
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function m(id){return document.getElementById(id);}
+function pv(id){const e=m(id);return e?parseFloat(e.value.replace(/[$,]/g,''))||0:0;}
+function fm(n){const s=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});return(n<0?'-':'')+'$'+s;}
+function mp(mi,key){return `m${mi}_${key}`;}
+function fi(id,cls,ph){return `<input class="fi${cls?' '+cls:''}" id="${id}" placeholder="${ph||'$0.00'}" oninput="calc(${id.match(/^m(\d+)/)[1]})">`;}
+function fiw(id,val,ph){return `<input class="fi w" id="${id}" value="${val||''}" placeholder="${ph||''}" oninput="autoSave()">`;}
+
+// ── Build page HTML for one month ──────────────────────────────────────────
+function buildPage(mi){
+  const mn=MONTHS[mi],em=MONTH_EM[mi];
+
+  // income rows
+  let incH=INC_ITEMS.map((v,i)=>`
+    <div class="drow${i%2?' alt':''}" style="grid-template-columns:1fr 72px 72px 28px;margin-bottom:2px">
+      <div class="dc lbl">${fiw(mp(mi,'in_n'+i),v,'Description')}</div>
+      <div class="dc ri">${fi(mp(mi,'in_b'+i))}</div>
+      <div class="dc ri">${fi(mp(mi,'in_a'+i))}</div>
+      <div class="dc"></div>
+    </div>`).join('');
+
+  // bills rows
+  let billH='';
+  for(let i=0;i<BILL_COUNT;i++){billH+=`
+    <div class="drow${i%2?' alt':''}" style="grid-template-columns:58px 1fr 72px 72px 24px;margin-bottom:2px">
+      <div class="dc ri">${fi(mp(mi,'bl_d'+i),'dt','MM/DD')}</div>
+      <div class="dc lbl">${fiw(mp(mi,'bl_n'+i),'','Bill name')}</div>
+      <div class="dc ri">${fi(mp(mi,'bl_b'+i))}</div>
+      <div class="dc ri">${fi(mp(mi,'bl_a'+i))}</div>
+      <div class="dc ce"><div class="pd" id="${mp(mi,'bl_p'+i)}" onclick="tpd(this)"></div></div>
+    </div>`;}
+
+  let nfcuH='';
+  for(let i=0;i<NFCU_COUNT;i++){nfcuH+=`
+    <div class="drow${i%2?' alt':''}" style="grid-template-columns:58px 1fr 72px 72px 24px;margin-bottom:2px">
+      <div class="dc ri">${fi(mp(mi,'nf_d'+i),'dt','MM/DD')}</div>
+      <div class="dc lbl">${fiw(mp(mi,'nf_n'+i),'','Bill name')}</div>
+      <div class="dc ri">${fi(mp(mi,'nf_b'+i))}</div>
+      <div class="dc ri">${fi(mp(mi,'nf_a'+i))}</div>
+      <div class="dc ce"><div class="pd" id="${mp(mi,'nf_p'+i)}" onclick="tpd(this)"></div></div>
+    </div>`;}
+
+  // variable rows
+  let varH=VAR_ITEMS.map((v,i)=>`
+    <div class="drow${i%2?' alt':''}" style="grid-template-columns:1fr 72px 72px 28px;margin-bottom:2px">
+      <div class="dc lbl">${fiw(mp(mi,'vr_n'+i),v,'Expense')}</div>
+      <div class="dc ri">${fi(mp(mi,'vr_b'+i))}</div>
+      <div class="dc ri">${fi(mp(mi,'vr_a'+i))}</div>
+      <div class="dc"></div>
+    </div>`).join('');
+
+  // savings
+  let savH=SAV_ITEMS.map((v,i)=>`
+    <div class="drow${i%2?' alt':''}" style="grid-template-columns:52px 1fr 62px 62px;margin-bottom:2px">
+      <div class="dc ri">${fi(mp(mi,'sv_bg'+i),'sm','$0')}</div>
+      <div class="dc lbl" style="font-weight:600;font-size:11px">${v}</div>
+      <div class="dc ri">${fi(mp(mi,'sv_b'+i))}</div>
+      <div class="dc ri">${fi(mp(mi,'sv_e'+i))}</div>
+    </div>`).join('');
+
+  // sinking
+  let sinkH=SINK_ITEMS.map((v,i)=>`
+    <div class="drow${i%2?' alt':''}" style="grid-template-columns:1fr 72px;margin-bottom:2px">
+      <div class="dc lbl" style="font-size:10px">${v?v:fiw(mp(mi,'sk_n'+i),'','Item')}</div>
+      <div class="dc ri">${fi(mp(mi,'sk_v'+i))}</div>
+    </div>`).join('');
+
+  // mcu
+  let mcuH=MCU_ITEMS.map((v,i)=>`
+    <div class="drow${i%2?' alt':''}" style="grid-template-columns:58px 1fr 80px 80px;margin-bottom:2px">
+      <div class="dc ri">${fi(mp(mi,'mc_bg'+i),'sm','$0')}</div>
+      <div class="dc lbl" style="font-weight:600;font-size:11px">${v}</div>
+      <div class="dc ri">${fi(mp(mi,'mc_b'+i))}</div>
+      <div class="dc ri">${fi(mp(mi,'mc_e'+i))}</div>
+    </div>`).join('');
+
+  return `
+<div class="mpage" id="page_${mi}">
+
+  <!-- Cover -->
+  <div class="cover">
+    <h2>${em} ${mn} ${YEAR}</h2>
+    <div class="cover-sub">Biweekly Budget Planner · Pay Period</div>
+    <div class="cover-fields">
+      <div class="cf"><div class="cf-lbl">Pay Period</div><input id="${mp(mi,'pay_period')}" placeholder="e.g. ${mn.slice(0,3)} 1–15" oninput="autoSave()"/></div>
+      <div class="cf"><div class="cf-lbl">Pay Date</div><input id="${mp(mi,'pay_date')}" placeholder="MM/DD/${YEAR}" oninput="autoSave()"/></div>
+    </div>
+    <div class="prev-bal-display">
+      💰 Previous Balance: <span id="${mp(mi,'prev_disp')}">$0.00</span>
+      <input type="hidden" id="${mp(mi,'prev_bal')}" value="0" oninput="calc(${mi})"/>
+    </div>
+  </div>
+
+  <div class="fdiv">🌸 🌺 🌼 🌷 🌻</div>
+
+  <!-- YNAB WIDGET -->
+  <div class="ynab-bar">
+    <div class="ynab-title">
+      <span>💚 YNAB — Live Balances</span>
+      <button class="ynab-refresh-btn" onclick="refreshYNAB(${mi})">↻ Refresh YNAB</button>
+    </div>
+    <div class="ynab-accounts">
+      <div class="ynab-acct"><div class="ynab-acct-name">Checking</div><div class="ynab-acct-bal" id="${mp(mi,'ynab_chk')}">—</div><div class="ynab-acct-type">Checking</div></div>
+      <div class="ynab-acct"><div class="ynab-acct-name">Navy Federal</div><div class="ynab-acct-bal" id="${mp(mi,'ynab_nfcu')}">—</div><div class="ynab-acct-type">Checking</div></div>
+    </div>
+    <div class="ynab-tx-info" id="${mp(mi,'ynab_info')}">Tap ↻ Refresh to load YNAB balances &amp; auto-fill Actual column</div>
+  </div>
+
+  <!-- INCOME -->
+  <div class="section s-rose">
+    <div class="sh"><span class="sh-em">🌷</span><span class="sh-title">Income</span></div>
+    <div class="sb">
+      <div class="hrow" style="grid-template-columns:1fr 72px 72px 28px">
+        <div class="hc l">Description</div><div class="hc">Budget</div><div class="hc">Actual</div><div class="hc"></div>
+      </div>
+      ${incH}
+      <div class="drow trow" style="grid-template-columns:1fr 72px 72px 28px">
+        <div class="dc lbl b">🌷 Total Income</div>
+        <div class="dc ri"><span id="${mp(mi,'inc_bt')}" class="sval pos" style="font-size:12px">$0.00</span></div>
+        <div class="dc ri"><span id="${mp(mi,'inc_at')}" class="sval pos" style="font-size:12px">$0.00</span></div>
+        <div class="dc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILLS -->
+  <div class="section s-lav">
+    <div class="sh"><span class="sh-em">🌺</span><span class="sh-title">Bills</span></div>
+    <div class="sb">
+      <div class="hrow" style="grid-template-columns:58px 1fr 72px 72px 24px">
+        <div class="hc">Date</div><div class="hc l">Bill</div><div class="hc">Budget</div><div class="hc">Actual</div><div class="hc">✓</div>
+      </div>
+      ${billH}
+      <div style="padding:5px 9px;background:rgba(176,160,216,.18);border-radius:6px;margin:5px 0;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--lav3)">🏦 Navy Federal</div>
+      ${nfcuH}
+      <div class="drow trow" style="grid-template-columns:58px 1fr 72px 72px 24px;margin-top:4px">
+        <div class="dc"></div><div class="dc lbl b">🌺 Total Bills</div>
+        <div class="dc ri"><span id="${mp(mi,'bil_bt')}" class="sval pos" style="font-size:12px">$0.00</span></div>
+        <div class="dc ri"><span id="${mp(mi,'bil_at')}" class="sval pos" style="font-size:12px">$0.00</span></div>
+        <div class="dc"></div>
+      </div>
+      <div class="drow" style="grid-template-columns:58px 1fr 72px 72px 24px;margin-top:3px">
+        <div class="dc"></div><div class="dc lbl" style="font-style:italic;font-size:10px">Over / Under</div>
+        <div class="dc"></div>
+        <div class="dc ri"><span id="${mp(mi,'bil_ou')}" style="font-size:12px;font-weight:700;color:var(--sage3)">$0.00</span></div>
+        <div class="dc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VARIABLE -->
+  <div class="section s-peach">
+    <div class="sh"><span class="sh-em">🌼</span><span class="sh-title">Variable Expenses</span></div>
+    <div class="sb">
+      <div class="hrow" style="grid-template-columns:1fr 72px 72px 28px">
+        <div class="hc l">Expense</div><div class="hc">Budget</div><div class="hc">Actual</div><div class="hc"></div>
+      </div>
+      ${varH}
+      <div class="drow trow" style="grid-template-columns:1fr 72px 72px 28px">
+        <div class="dc lbl b">🌼 Total Variable</div>
+        <div class="dc ri"><span id="${mp(mi,'var_bt')}" class="sval pos" style="font-size:12px">$0.00</span></div>
+        <div class="dc ri"><span id="${mp(mi,'var_at')}" class="sval pos" style="font-size:12px">$0.00</span></div>
+        <div class="dc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVINGS + SINKING -->
+  <div class="tcol">
+    <div class="section s-sage">
+      <div class="sh"><span class="sh-em">🌿</span><span class="sh-title">Savings</span></div>
+      <div class="sb">
+        <div class="hrow" style="grid-template-columns:52px 1fr 62px 62px">
+          <div class="hc">Beg</div><div class="hc l">Account</div><div class="hc">Bgt</div><div class="hc">End</div>
+        </div>
+        ${savH}
+        <div class="drow trow" style="grid-template-columns:52px 1fr 62px 62px">
+          <div class="dc"></div><div class="dc lbl b" style="font-size:10px">🌿 Total</div>
+          <div class="dc ri"><span id="${mp(mi,'sav_bt')}" class="sval pos" style="font-size:11px">$0.00</span></div>
+          <div class="dc ri"><span id="${mp(mi,'sav_et')}" class="sval pos" style="font-size:11px">$0.00</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="section s-lilac">
+      <div class="sh"><span class="sh-em">💜</span><span class="sh-title">Sinking Funds</span></div>
+      <div class="sb">
+        <div class="hrow" style="grid-template-columns:1fr 72px">
+          <div class="hc l">Item</div><div class="hc">Amount</div>
+        </div>
+        ${sinkH}
+        <div class="drow trow" style="grid-template-columns:1fr 72px">
+          <div class="dc lbl b" style="font-size:10px">💜 Total</div>
+          <div class="dc ri"><span id="${mp(mi,'sink_t')}" class="sval pos" style="font-size:11px">$0.00</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVY FEDERAL SAVINGS -->
+  <div class="section s-sky">
+    <div class="sh"><span class="sh-em">🏦</span><span class="sh-title">Una Navy Federal Savings</span></div>
+    <div class="sb">
+      <div class="hrow" style="grid-template-columns:58px 1fr 80px 80px">
+        <div class="hc">Beg</div><div class="hc l">Account</div><div class="hc">Budget</div><div class="hc">End Bal</div>
+      </div>
+      ${mcuH}
+      <div class="drow trow" style="grid-template-columns:58px 1fr 80px 80px">
+        <div class="dc"></div><div class="dc lbl b">🏦 Total</div>
+        <div class="dc ri"><span id="${mp(mi,'mcu_bt')}" class="sval pos" style="font-size:12px">$0.00</span></div>
+        <div class="dc ri"><span id="${mp(mi,'mcu_et')}" class="sval pos" style="font-size:12px">$0.00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fdiv">🌸 🌺 🌼 🌷 🌻</div>
+
+  <!-- SUMMARY -->
+  <div class="section s-sum">
+    <div class="sh"><span class="sh-em">💰</span><span class="sh-title">Summary — Income Minus Expenses</span></div>
+    <div class="sb">
+      <div class="sum-grid">
+        <div class="scard" style="background:rgba(248,200,196,.5)"><div class="sval" id="${mp(mi,'s_prev')}">$0.00</div><div class="slbl">Prev Balance</div></div>
+        <div class="scard" style="background:rgba(168,200,168,.5)"><div class="sval" id="${mp(mi,'s_inc')}">$0.00</div><div class="slbl">Income</div></div>
+        <div class="scard" style="background:rgba(200,184,232,.5)"><div class="sval" id="${mp(mi,'s_bil')}">$0.00</div><div class="slbl">Bills</div></div>
+        <div class="scard" style="background:rgba(248,216,168,.5)"><div class="sval" id="${mp(mi,'s_var')}">$0.00</div><div class="slbl">Variable</div></div>
+        <div class="scard" style="background:rgba(168,200,232,.5)"><div class="sval" id="${mp(mi,'s_sav')}">$0.00</div><div class="slbl">Savings</div></div>
+        <div class="scard big"><div class="sval" id="${mp(mi,'s_net')}">$0.00</div><div class="slbl">🌸 Net Balance</div></div>
+      </div>
+      <div class="notes-area">
+        <div class="notes-lbl">📝 Notes for ${mn}</div>
+        <textarea id="${mp(mi,'notes')}" oninput="autoSave()" placeholder="Goals, reminders, focus for ${mn}... 🌸"></textarea>
+      </div>
+    </div>
+  </div>
+
+</div>`;
+}
+
+// ── Calculations ─────────────────────────────────────────────────────────────
+function calc(mi){
+  // Income
+  let ib=0,ia=0;
+  INC_ITEMS.forEach((_,i)=>{ib+=pv(mp(mi,'in_b'+i));ia+=pv(mp(mi,'in_a'+i));});
+  setSp(mp(mi,'inc_bt'),ib);setSp(mp(mi,'inc_at'),ia);
+
+  // Bills
+  let bb=0,ba=0;
+  for(let i=0;i<BILL_COUNT;i++){bb+=pv(mp(mi,'bl_b'+i));ba+=pv(mp(mi,'bl_a'+i));}
+  for(let i=0;i<NFCU_COUNT;i++){bb+=pv(mp(mi,'nf_b'+i));ba+=pv(mp(mi,'nf_a'+i));}
+  setSp(mp(mi,'bil_bt'),bb);setSp(mp(mi,'bil_at'),ba);
+  const ou=bb-ba;const oue=m(mp(mi,'bil_ou'));
+  if(oue){oue.textContent=fm(ou);oue.style.color=ou>=0?'var(--sage3)':'#e06060';}
+
+  // Variable
+  let vb=0,va=0;
+  VAR_ITEMS.forEach((_,i)=>{vb+=pv(mp(mi,'vr_b'+i));va+=pv(mp(mi,'vr_a'+i));});
+  setSp(mp(mi,'var_bt'),vb);setSp(mp(mi,'var_at'),va);
+
+  // Savings
+  let sb=0,se=0;
+  SAV_ITEMS.forEach((_,i)=>{sb+=pv(mp(mi,'sv_b'+i));se+=pv(mp(mi,'sv_e'+i));});
+  setSp(mp(mi,'sav_bt'),sb);setSp(mp(mi,'sav_et'),se);
+
+  // Sinking
+  let skv=0;SINK_ITEMS.forEach((_,i)=>{skv+=pv(mp(mi,'sk_v'+i));});
+  setSp(mp(mi,'sink_t'),skv);
+
+  // MCU
+  let mb=0,me=0;
+  MCU_ITEMS.forEach((_,i)=>{mb+=pv(mp(mi,'mc_b'+i));me+=pv(mp(mi,'mc_e'+i));});
+  setSp(mp(mi,'mcu_bt'),mb);setSp(mp(mi,'mcu_et'),me);
+
+  // Summary — get prev balance from hidden field
+  const prev=pv(mp(mi,'prev_bal'));
+  const net=prev+ia-ba-va-sb;
+
+  // Update display
+  const pd=m(mp(mi,'prev_disp'));if(pd)pd.textContent=fm(prev);
+
+  const sumMap=[[mp(mi,'s_prev'),prev],[mp(mi,'s_inc'),ia],[mp(mi,'s_bil'),ba],[mp(mi,'s_var'),va],[mp(mi,'s_sav'),sb],[mp(mi,'s_net'),net]];
+  sumMap.forEach(([id,v])=>{
+    const el=m(id);if(!el)return;
+    el.textContent=fm(v);
+    el.className='sval '+(v>=0?'pos':'neg');
+  });
+
+  // Store net balance so next month can pick it up
+  storeNetBalance(mi,net);
+  updateTabIndicator(mi);
+  autoSave();
+}
+
+function setSp(id,v){
+  const e=m(id);if(!e)return;
+  e.textContent=fm(v);
+  e.className='sval '+(v>=0?'pos':'neg');
+  e.style.fontSize='12px';
+}
+
+// ── Tab indicator ─────────────────────────────────────────────────────────────
+function updateTabIndicator(mi){
+  const tab=document.querySelector(`.mtab[data-mi="${mi}"]`);
+  if(!tab)return;
+  // Check if month has any data
+  const hasData=INC_ITEMS.some((_,i)=>pv(mp(mi,'in_a'+i))>0)||
+    Array.from({length:BILL_COUNT},(_,i)=>pv(mp(mi,'bl_a'+i))).some(v=>v>0);
+  tab.classList.toggle('has-data',hasData);
+}
+
+// ── Balance carry-forward ─────────────────────────────────────────────────────
+function storeNetBalance(mi,net){
+  try{
+    const key='net_bal_'+YEAR+'_'+mi;
+    localStorage.setItem(key,net.toString());
+  }catch(e){}
+}
+
+function getNetBalance(mi){
+  try{return parseFloat(localStorage.getItem('net_bal_'+YEAR+'_'+mi))||0;}
+  catch(e){return 0;}
+}
+
+// Pull previous month's net balance into current month
+function copyPrevBalance(){
+  if(currentMonth===0){alert('No previous month — this is January!');return;}
+  const prevNet=getNetBalance(currentMonth-1);
+  const hiddenField=m(mp(currentMonth,'prev_bal'));
+  if(hiddenField){
+    hiddenField.value=prevNet.toString();
+    calc(currentMonth);
+    alert('🌸 Pulled '+fm(prevNet)+' from '+MONTHS[currentMonth-1]+' into '+MONTHS[currentMonth]+'!');
+  }
+}
+
+// ── Pd toggle ──────────────────────────────────────────────────────────────────
+function tpd(el){el.classList.toggle('on');el.textContent=el.classList.contains('on')?'✓':'';autoSave();}
+
+// ── Tab switching ──────────────────────────────────────────────────────────────
+function switchMonth(mi){
+  currentMonth=mi;
+  document.querySelectorAll('.mpage').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  const page=m('page_'+mi);if(page)page.classList.add('active');
+  const tab=document.querySelector(`.mtab[data-mi="${mi}"]`);if(tab)tab.classList.add('active');
+  calc(mi);
+}
+
+// ── Save / Load ────────────────────────────────────────────────────────────────
+function gatherMonth(mi){
+  const d={};
+  document.querySelectorAll(`[id^="m${mi}_"]`).forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')d[el.id]=el.value;
+    else if(el.classList.contains('pd'))d[el.id+'_c']=el.classList.contains('on');
+  });
+  return d;
+}
+
+function applyMonth(d){
+  Object.entries(d).forEach(([k,v])=>{
+    if(k.endsWith('_c')){
+      const el=m(k.slice(0,-2));
+      if(el){el.classList.toggle('on',v);el.textContent=v?'✓':'';}
+    } else {
+      const el=m(k);if(el)el.value=v;
+    }
+  });
+}
+
+function autoSave(){
+  try{
+    const data={};
+    MONTHS.forEach((_,mi)=>{data['m'+mi]=gatherMonth(mi);});
+    localStorage.setItem('budget_planner_annual_'+YEAR,JSON.stringify(data));
+  }catch(e){}
+}
+
+function saveAll(){
+  autoSave();
+  // Recalc all months to store net balances
+  MONTHS.forEach((_,mi)=>calc(mi));
+  alert('🌸 All months saved!');
+}
+
+function loadAll(){
+  try{
+    const raw=localStorage.getItem('budget_planner_annual_'+YEAR);
+    if(!raw){alert('No saved data found for '+YEAR+'.');return;}
+    const data=JSON.parse(raw);
+    MONTHS.forEach((_,mi)=>{if(data['m'+mi])applyMonth(data['m'+mi]);});
+    MONTHS.forEach((_,mi)=>calc(mi));
+    switchMonth(currentMonth);
+    alert('🌸 '+YEAR+' budget loaded!');
+  }catch(e){alert('Could not load saved data.');}
+}
+
+function clearMonth(){
+  if(!confirm('Clear all data for '+MONTHS[currentMonth]+'?'))return;
+  document.querySelectorAll(`[id^="m${currentMonth}_"]`).forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value='';
+    else if(el.classList.contains('pd')){el.classList.remove('on');el.textContent='';}
+  });
+  calc(currentMonth);
+  autoSave();
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+(function init(){
+  // Build tabs
+  const tabContainer=m('month-tabs');
+  // Bill Calendar tab
+  const billTab=document.createElement('button');
+  billTab.className='mtab';
+  billTab.textContent='🌺 Bills';
+  billTab.id='bill-cal-tab';
+  billTab.onclick=()=>{
+    document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+    billTab.classList.add('active');
+    showBillCal();
+  };
+  tabContainer.appendChild(billTab);
+  // Month tabs
+  MONTHS.forEach((mn,mi)=>{
+    const btn=document.createElement('button');
+    btn.className='mtab'+(mi===currentMonth?' active':'');
+    btn.textContent=mn.slice(0,3);
+    btn.dataset.mi=mi;
+    btn.onclick=()=>{
+      document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+      btn.classList.add('active');
+      switchMonth(mi);
+    };
+    tabContainer.appendChild(btn);
+  });
+
+  // Build pages
+  const pagesEl=m('pages');
+  MONTHS.forEach((_,mi)=>{
+    const div=document.createElement('div');
+    div.innerHTML=buildPage(mi);
+    pagesEl.appendChild(div.firstElementChild||div);
+  });
+
+  // Activate current month
+  const curPage=m('page_'+currentMonth);
+  if(curPage)curPage.classList.add('active');
+
+  // Load saved data
+  try{
+    const raw=localStorage.getItem('budget_planner_annual_'+YEAR);
+    if(raw){
+      const data=JSON.parse(raw);
+      MONTHS.forEach((_,mi)=>{if(data['m'+mi])applyMonth(data['m'+mi]);});
+    }
+  }catch(e){}
+
+  // Calc all months
+  MONTHS.forEach((_,mi)=>calc(mi));
+})();
+
+// ═══ YNAB INTEGRATION ═════════════════════════════════════════════════════════
+const YNAB_TOKEN='AgoHnYzoO9KYG8osZwmc2AOEv_V4Pe_86utrJtqmIMg';
+const YNAB_WORKER='https://ynab-proxy.ustevens.workers.dev';
+
+// The two accounts we want — exactly as named in YNAB
+const ACCOUNT_CHECKING='Checking';
+const ACCOUNT_NF='Una Navy Federal Checking (5355)';
+
+// Category name → variable expense row index mapping
+const CAT_TO_ROW={
+  'gas':0,'fuel':0,'gasoline':0,
+  'groceries':2,'supermarket':2,'publix':2,
+  'dining out':3,'restaurants':3,'fast food':3,'eat out':3,
+  'coffee shops':4,'dunkin':4,'starbucks':4,'coffee':4,
+  'tolls':5,'epass':5,'e-pass':5,
+  'miscellaneous':6,'misc':6,'general merchandise':6,
+  'sunpass':7,
+  'personal care':8,'nails':8,'beauty':8,'hair':8,
+  'clothing':9,'shopping':9,'purse':9,
+};
+
+let ynabBudgetId=null;
+
+function ynabFetch(path){
+  const url=YNAB_WORKER+'?path='+encodeURIComponent(path)+'&token='+encodeURIComponent(YNAB_TOKEN);
+  return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>reject(new Error('Timed out after 10s')),10000);
+    fetch(url)
+      .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+      .then(txt=>{
+        clearTimeout(timer);
+        if(!txt)throw new Error('Empty response');
+        const json=JSON.parse(txt);
+        if(json.error)throw new Error(json.error.detail||'YNAB error');
+        resolve(json);
+      })
+      .catch(e=>{clearTimeout(timer);reject(e);});
+  });
+}
+
+function fmMoney(milliunits){
+  // YNAB stores all amounts as milliunits — divide by 1000 for dollars
+  const dollars=milliunits/1000;
+  const abs=Math.abs(dollars).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return(dollars<0?'-':'')+'$'+abs;
+}
+
+async function refreshYNAB(mi){
+  const info=m(mp(mi,'ynab_info'));
+  const btn=m(mp(mi,'ynab_btn'));
+  if(btn){btn.textContent='⏳ Loading…';btn.disabled=true;}
+  if(info)info.textContent='Connecting to YNAB…';
+
+  try{
+    // Step 1: Get budget ID
+    if(!ynabBudgetId){
+      if(info)info.textContent='Getting budget…';
+      const bd=await ynabFetch('/budgets');
+      const budgets=bd.data.budgets||[];
+      if(!budgets.length)throw new Error('No budgets found in YNAB');
+      ynabBudgetId=budgets[0].id;
+    }
+
+    // Step 2: Get accounts
+    if(info)info.textContent='Loading account balances…';
+    const ad=await ynabFetch('/budgets/'+ynabBudgetId+'/accounts');
+    const accounts=(ad.data.accounts||[]).filter(a=>!a.deleted&&!a.closed);
+
+    // Step 3: Show ALL raw account data so we can debug
+    // Display every account with ALL balance fields
+    const debugLines=accounts.map(a=>
+      a.name+' | balance='+a.balance+' ('+fmMoney(a.balance)+') | cleared='+a.cleared_balance+' ('+fmMoney(a.cleared_balance)+') | uncleared='+a.uncleared_balance
+    ).join('\n');
+    if(info)info.innerHTML='<pre style="font-size:9px;white-space:pre-wrap;color:var(--ink)">'+debugLines+'</pre>';
+
+    // Find our two exact accounts by name
+    const chkAcct=accounts.find(a=>a.name===ACCOUNT_CHECKING);
+    const nfAcct=accounts.find(a=>a.name===ACCOUNT_NF);
+
+    // Step 4: Display balances
+    // YNAB balance field = working balance (cleared + uncleared) = what you see in the app
+    const chkEl=m(mp(mi,'ynab_chk'));
+    const nfEl=m(mp(mi,'ynab_nfcu'));
+    const chkNameEl=m(mp(mi,'ynab_chk_name'));
+    const nfNameEl=m(mp(mi,'ynab_nfcu_name'));
+
+    if(chkAcct){
+      const bal=chkAcct.balance; // milliunits — $47.44 stored as 47440
+      if(chkEl){chkEl.textContent=fmMoney(bal);chkEl.className='ynab-acct-bal'+(bal<0?' neg':'');}
+      if(chkNameEl)chkNameEl.textContent='Checking';
+    } else {
+      if(chkEl)chkEl.textContent='Not found';
+    }
+
+    if(nfAcct){
+      const bal=nfAcct.balance;
+      if(nfEl){nfEl.textContent=fmMoney(bal);nfEl.className='ynab-acct-bal'+(bal<0?' neg':'');}
+      if(nfNameEl)nfNameEl.textContent='Navy Federal';
+    } else {
+      if(nfEl)nfEl.textContent='Not found';
+    }
+
+    // Step 5: Get transactions for this month
+    if(info)info.textContent='Loading transactions…';
+    const yr=new Date().getFullYear();
+    const mo=String(mi+1).padStart(2,'0');
+    const since=yr+'-'+mo+'-01';
+    const td=await ynabFetch('/budgets/'+ynabBudgetId+'/transactions?since_date='+since);
+    const txs=(td.data.transactions||[]).filter(t=>!t.deleted);
+
+    // Step 6: Group outflow transactions by category → sum amounts
+    const catSums={};
+    let totalInflow=0;
+    txs.forEach(t=>{
+      const amt=t.amount/1000; // convert milliunits to dollars
+      const cat=(t.category_name||'').toLowerCase().trim();
+      if(amt<0){
+        // Outflow (spending) — store as positive number
+        catSums[cat]=(catSums[cat]||0)+Math.abs(amt);
+      } else {
+        // Inflow (income)
+        totalInflow+=amt;
+      }
+    });
+
+    // Step 7: Auto-fill Actual columns
+    let filled=0;
+
+    // Fill income actual row 0 (Pay)
+    if(totalInflow>0){
+      const f=m(mp(mi,'in_a0'));
+      if(f){f.value=totalInflow.toFixed(2);f.classList.add('ynab-auto');filled++;}
+    }
+
+    // Fill variable expense actuals by category name matching
+    Object.entries(catSums).forEach(([cat,amt])=>{
+      // Direct map lookup
+      if(CAT_TO_ROW[cat]!==undefined){
+        const rowIdx=CAT_TO_ROW[cat];
+        const f=m(mp(mi,'vr_a'+rowIdx));
+        if(f){
+          const existing=parseFloat(f.value)||0;
+          f.value=(existing+amt).toFixed(2);
+          f.classList.add('ynab-auto');
+          filled++;
+        }
+        return;
+      }
+      // Fuzzy match against variable row labels
+      VAR_ITEMS.forEach((defLabel,i)=>{
+        const label=(m(mp(mi,'vr_n'+i))||{value:defLabel||''}).value.toLowerCase().trim();
+        if(!label)return;
+        if(cat.includes(label)||label.includes(cat.split(' ')[0])){
+          const f=m(mp(mi,'vr_a'+i));
+          if(f&&!f.classList.contains('ynab-auto')){
+            f.value=((parseFloat(f.value)||0)+amt).toFixed(2);
+            f.classList.add('ynab-auto');
+            filled++;
+          }
+        }
+      });
+      // Match bill rows by name
+      for(let i=0;i<BILL_COUNT;i++){
+        const nameEl=m(mp(mi,'bl_n'+i));
+        const billName=(nameEl?nameEl.value:'').toLowerCase().trim();
+        if(billName.length>2&&(cat.includes(billName)||billName.includes(cat.split(' ')[0]))){
+          const f=m(mp(mi,'bl_a'+i));
+          if(f&&!f.classList.contains('ynab-auto')){
+            f.value=((parseFloat(f.value)||0)+amt).toFixed(2);
+            f.classList.add('ynab-auto');
+            filled++;
+          }
+        }
+      }
+    });
+
+    // Recalc totals
+    calc(mi);
+
+    const txCount=txs.length;
+    if(info)info.innerHTML='✓ <span>'+txCount+' transactions</span> · <span>'+filled+' rows filled</span> · Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+
+  }catch(e){
+    console.error('YNAB error:',e);
+    if(info)info.textContent='Error: '+e.message;
+  }finally{
+    if(btn){btn.textContent='↻ Refresh YNAB';btn.disabled=false;}
+  }
+}
+
+// ═══ BILL CALENDAR ════════════════════════════════════════════════════════════
+let bills=JSON.parse(localStorage.getItem('bill_entries_v1')||'[]');
+// bills: [{id,name,amount,day,freq,paid:{YYYY-MM-DD:bool}}]
+
+const BILL_DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const BILL_MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function saveBills(){localStorage.setItem('bill_entries_v1',JSON.stringify(bills));}
+
+function getBillsForMonth(year,month){
+  // Returns [{bill,date}] for all bills due this month
+  const result=[];
+  bills.forEach(b=>{
+    if(b.freq==='monthly'||b.freq==='once'){
+      const day=Math.min(b.day,new Date(year,month+1,0).getDate());
+      result.push({bill:b,date:new Date(year,month,day)});
+    } else if(b.freq==='biweekly'){
+      // Every 14 days from first occurrence
+      let d=new Date(year,month,b.day);
+      while(d.getMonth()===month){result.push({bill:b,date:new Date(d)});d.setDate(d.getDate()+14);}
+      // Also check backwards
+      let d2=new Date(year,month,b.day);d2.setDate(d2.getDate()-14);
+      while(d2.getMonth()===month){result.push({bill:b,date:new Date(d2)});d2.setDate(d2.getDate()-14);}
+    } else if(b.freq==='weekly'){
+      let d=new Date(year,month,b.day);
+      while(d.getMonth()===month){result.push({bill:b,date:new Date(d)});d.setDate(d.getDate()+7);}
+    }
+  });
+  return result.sort((a,b2)=>a.date-b2.date);
+}
+
+function isPaid(bill,date){
+  const key=date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
+  return !!(bill.paid&&bill.paid[key]);
+}
+
+function toggleBillPaid(billId,dateStr){
+  const b=bills.find(x=>x.id===billId);if(!b)return;
+  if(!b.paid)b.paid={};
+  b.paid[dateStr]=!b.paid[dateStr];
+  saveBills();
+  renderBillCalendar();renderBillPeriod();renderBillManage();
+}
+
+function renderBillCalendar(){
+  const mi=currentMonth,year=new Date().getFullYear();
+  const title=document.getElementById('bcal-title');
+  if(title)title.textContent='🌺 '+BILL_MONTHS[mi]+' '+year+' — Bill Calendar';
+  const grid=document.getElementById('bcal-grid');
+  if(!grid)return;
+  grid.innerHTML='';
+  BILL_DAYS.forEach(d=>{
+    const h=document.createElement('div');h.className='bill-day-name';h.textContent=d;grid.appendChild(h);
+  });
+  const firstDay=new Date(year,mi,1).getDay();
+  const daysInMonth=new Date(year,mi+1,0).getDate();
+  const daysInPrev=new Date(year,mi,0).getDate();
+  const today=new Date();
+  const monthBills=getBillsForMonth(year,mi);
+  const billsByDay={};
+  monthBills.forEach(({bill,date})=>{
+    const d=date.getDate();if(!billsByDay[d])billsByDay[d]=[];
+    billsByDay[d].push({bill,date});
+  });
+  // Get pay period from inputs
+  const pfrom=document.getElementById('period-from')?.value;
+  const pto=document.getElementById('period-to')?.value;
+  const periodFrom=pfrom?new Date(pfrom+'T00:00:00'):null;
+  const periodTo=pto?new Date(pto+'T23:59:59'):null;
+
+  const total=Math.ceil((firstDay+daysInMonth)/7)*7;
+  for(let i=0;i<total;i++){
+    const cell=document.createElement('div');
+    let dayNum,isCurrentMonth=true;
+    if(i<firstDay){dayNum=daysInPrev-firstDay+i+1;isCurrentMonth=false;}
+    else if(i>=firstDay+daysInMonth){dayNum=i-firstDay-daysInMonth+1;isCurrentMonth=false;}
+    else dayNum=i-firstDay+1;
+    const cellDate=new Date(year,isCurrentMonth?mi:(i<firstDay?mi-1:mi+1),dayNum);
+    const isToday=cellDate.toDateString()===today.toDateString();
+    const inPeriod=periodFrom&&periodTo&&cellDate>=periodFrom&&cellDate<=periodTo;
+    const hasBill=isCurrentMonth&&billsByDay[dayNum]&&billsByDay[dayNum].length>0;
+    cell.className='bill-day'+(isCurrentMonth?'':' other-month')+(isToday?' today':'')+(inPeriod?' in-period':'')+(hasBill?' has-bill':'');
+    const numEl=document.createElement('div');numEl.className='bill-day-num';numEl.textContent=dayNum;cell.appendChild(numEl);
+    if(isCurrentMonth&&billsByDay[dayNum]){
+      billsByDay[dayNum].slice(0,2).forEach(({bill,date})=>{
+        const dateStr=year+'-'+String(mi+1).padStart(2,'0')+'-'+String(dayNum).padStart(2,'0');
+        const paid=isPaid(bill,date);
+        const pill=document.createElement('div');
+        pill.className='bill-pill'+(paid?' paid':'');
+        pill.textContent=(bill.amount?'$'+parseFloat(bill.amount).toFixed(0)+' ':'')+bill.name;
+        pill.title=bill.name+' — $'+bill.amount+(paid?' (PAID)':'');
+        pill.onclick=()=>toggleBillPaid(bill.id,dateStr);
+        cell.appendChild(pill);
+      });
+      if(billsByDay[dayNum].length>2){
+        const more=document.createElement('div');more.style.cssText='font-size:8px;color:var(--lav3);cursor:pointer;';
+        more.textContent='+'+(billsByDay[dayNum].length-2)+' more';cell.appendChild(more);
+      }
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function renderBillPeriod(){
+  const pfrom=document.getElementById('period-from')?.value;
+  const pto=document.getElementById('period-to')?.value;
+  const list=document.getElementById('period-bills-list');
+  if(!list)return;
+  list.innerHTML='';
+  if(!pfrom||!pto){list.innerHTML='<div style="font-size:12px;color:var(--ink3)">Set a pay period above to see your bills.</div>';renderBillCalendar();return;}
+  const from=new Date(pfrom+'T00:00:00');
+  const to=new Date(pto+'T23:59:59');
+  const year=from.getFullYear();
+  // Get bills for both months in range
+  const allBills=[];
+  const months=[from.getMonth()];
+  if(to.getMonth()!==from.getMonth())months.push(to.getMonth());
+  months.forEach(mo=>{
+    getBillsForMonth(year,mo).forEach(({bill,date})=>{
+      if(date>=from&&date<=to)allBills.push({bill,date});
+    });
+  });
+  // Remove dupes
+  const seen=new Set();
+  const filtered=allBills.filter(({bill,date})=>{
+    const k=bill.id+date.toDateString();if(seen.has(k))return false;seen.add(k);return true;
+  });
+  if(!filtered.length){list.innerHTML='<div style="font-size:12px;color:var(--ink3)">No bills in this pay period.</div>';renderBillCalendar();return;}
+  let total=0;
+  filtered.forEach(({bill,date})=>{
+    const dateStr=date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
+    const paid=isPaid(bill,date);
+    const isToday=date.toDateString()===new Date().toDateString();
+    const isPast=date<new Date()&&!paid;
+    const div=document.createElement('div');
+    div.className='period-bill-item'+(paid?' paid':isPast?' overdue':'');
+    const dayName=BILL_DAYS[date.getDay()];
+    const mo=String(date.getMonth()+1).padStart(2,'0'),dy=String(date.getDate()).padStart(2,'0');
+    div.innerHTML=`<div class="pbi-date">${mo}/${dy}<span class="pbi-day">${dayName}</span></div>
+      <div class="pbi-name">${bill.name}${isToday?' 📌':''}</div>
+      <div class="pbi-amount">$${parseFloat(bill.amount||0).toFixed(2)}</div>
+      <div class="pbi-pd${paid?' on':''}" onclick="toggleBillPaid('${bill.id}','${dateStr}')" title="${paid?'Mark unpaid':'Mark paid'}">${paid?'✓':''}</div>`;
+    list.appendChild(div);
+    if(!paid)total+=parseFloat(bill.amount||0);
+  });
+  const totalDiv=document.createElement('div');totalDiv.className='period-total';
+  totalDiv.innerHTML='<span class="period-total-lbl">Total Due This Period</span><span class="period-total-val">$'+total.toFixed(2)+'</span>';
+  list.appendChild(totalDiv);
+  renderBillCalendar();
+}
+
+function setDefaultPeriod(){
+  // Default to current semi-monthly period
+  const now=new Date();
+  const day=now.getDate();
+  let from,to;
+  if(day<=15){from=new Date(now.getFullYear(),now.getMonth(),1);to=new Date(now.getFullYear(),now.getMonth(),15);}
+  else{from=new Date(now.getFullYear(),now.getMonth(),16);to=new Date(now.getFullYear(),now.getMonth()+1,0);}
+  const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const fi=document.getElementById('period-from');const ti=document.getElementById('period-to');
+  if(fi)fi.value=fmt(from);if(ti)ti.value=fmt(to);
+  renderBillPeriod();
+}
+
+function renderBillManage(){
+  const list=document.getElementById('bill-manage-list');if(!list)return;
+  list.innerHTML='';
+  if(!bills.length){list.innerHTML='<div style="font-size:12px;color:var(--ink3)">No bills yet. Add your first bill below!</div>';return;}
+  bills.forEach((b,i)=>{
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(255,255,255,.55);border-radius:8px;border:1px solid rgba(255,255,255,.7);font-size:12px;';
+    div.innerHTML=`<span style="font-weight:700;color:var(--ink);flex:1">${b.name}</span>
+      <span style="color:var(--lav3);font-family:'Playfair Display',serif;font-size:14px">$${parseFloat(b.amount||0).toFixed(2)}</span>
+      <span style="color:var(--ink3);font-size:10px">Day ${b.day} · ${b.freq}</span>
+      <button onclick="deleteBillEntry(${i})" style="background:transparent;border:none;color:var(--ink3);cursor:pointer;font-size:13px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .2s" onmouseover="this.style.color='var(--rose3)'" onmouseout="this.style.color='var(--ink3)'">×</button>`;
+    list.appendChild(div);
+  });
+}
+
+function addBillEntry(){
+  const day=parseInt(document.getElementById('bill-day')?.value)||1;
+  const name=document.getElementById('bill-name-new')?.value.trim();
+  const amount=parseFloat(document.getElementById('bill-amt')?.value)||0;
+  const freq=document.getElementById('bill-freq')?.value||'monthly';
+  if(!name){alert('Please enter a bill name.');return;}
+  bills.push({id:Date.now().toString(),name,amount,day,freq,paid:{}});
+  saveBills();
+  document.getElementById('bill-day').value='';
+  document.getElementById('bill-name-new').value='';
+  document.getElementById('bill-amt').value='';
+  renderBillCalendar();renderBillPeriod();renderBillManage();
+}
+
+function deleteBillEntry(i){
+  if(!confirm('Delete "'+bills[i].name+'"?'))return;
+  bills.splice(i,1);saveBills();
+  renderBillCalendar();renderBillPeriod();renderBillManage();
+}
+
+// Show bill calendar pane
+function showBillCal(){
+  document.getElementById('pages').style.display='none';
+  document.getElementById('bill-cal-pane').style.display='block';
+  renderBillCalendar();renderBillPeriod();renderBillManage();
+  // Pre-fill period dates if empty
+  const fi=document.getElementById('period-from');
+  const ti=document.getElementById('period-to');
+  if(fi&&!fi.value)setDefaultPeriod();
+}
+
+function showBudget(){
+  document.getElementById('pages').style.display='block';
+  document.getElementById('bill-cal-pane').style.display='none';
+}
+
+// Hook into switchMonth to hide bill cal
+const _origSwitchMonth2=switchMonth;
+function switchMonth(mi){
+  showBudget();
+  _origSwitchMonth2(mi);
+}
+
+</script>
+</body>
+</html>
